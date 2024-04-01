@@ -3,10 +3,12 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		time.Sleep(1 * time.Second)
 		w.Write([]byte("Hello App1"))
 	})
 

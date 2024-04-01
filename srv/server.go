@@ -24,13 +24,22 @@ func New(url *url.URL) *Server {
 	}
 }
 
+// GetActiveConnection
 func (srv *Server) GetActiveConnection() int64 {
 	return srv.ActiveConnection.Load()
 }
-func (srv *Server) AddActiveConnection() {
+
+// AddConnectionCount
+func (srv *Server) AddConnectionCount() {
 	srv.ActiveConnection.Add(1)
 }
 
+// SubstractConnectionCount
+func (srv *Server) SubstractConnectionCount() {
+	srv.ActiveConnection.Add(-1)
+}
+
+// IsHealthy
 func (srv *Server) IsHealthy() bool {
 	return srv.HealthStatus
 }

@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 )
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("Hello")
+		time.Sleep(2 * time.Second)
 		w.Write([]byte("Hello App2"))
 	})
 

@@ -7,13 +7,12 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 func Execute() error {
 
 	srvs := []string{
-		"http://127.0.0.1:8080",
+		"http://127.0.0.1:8082",
 		"http://127.0.0.1:8081",
 	}
 
@@ -31,32 +30,12 @@ func Execute() error {
 	loadBalancer := lb.NewLoadBalancer(servers)
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		srv := loadBalancer.NextServerLeastActive()
+		srv := loadBalancer.NextServerLeastConnection()
+		fmt.Println(srv.URL.String())
+		srv.AddConnectionCount()
 
-		srv.AddActiveConnection()
-		fmt.Println(srv.URL.Host)
-		req, err := http.NewRequest(r.Method, srv.URL.Path, nil)
-		if err != nil {
-			fmt.Println("Error creating request:", err)
-			return
-		}
-
-		req.Header = r.Header
-		req.Host = r.Host
-		req.RemoteAddr = r.RemoteAddr
-
-		client := &http.Client{}
-		resp, err := client.Do(req)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		defer resp.Body.Close()
-
-		fmt.Printf("Response from server: %s %s\n\n", resp.Proto, resp.Status)
-
-		// srv.Proxy().ServeHTTP(w, r)
+		srv.Proxy().ServeHTTP(w, r)
+		srv.SubstractConnectionCount()
 	})
 
 	http.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
